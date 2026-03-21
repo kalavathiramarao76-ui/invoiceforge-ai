@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { saveContract, generateId } from "@/lib/storage";
 import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 export default function ContractPage() {
   const [clientName, setClientName] = useState("");
@@ -187,6 +188,7 @@ export default function ContractPage() {
                 )}
                 {copied ? "Copied!" : "Copy Markdown"}
               </button>
+              <ExportMenu content={content} title="Contract" />
               {contractId && (
                 <FavoriteButton id={contractId} type="contract" />
               )}

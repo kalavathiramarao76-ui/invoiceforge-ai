@@ -12,6 +12,7 @@ import {
   Zap,
   Home,
   Star,
+  Settings,
 } from "lucide-react";
 import OnboardingTour from "@/components/OnboardingTour";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/app/proposal", label: "Proposal", icon: Send },
   { href: "/app/contract", label: "Contract", icon: Shield },
   { href: "/app/templates", label: "Templates", icon: Layers },
+  { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {

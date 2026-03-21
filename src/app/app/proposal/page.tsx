@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { saveProposal, generateId } from "@/lib/storage";
 import FavoriteButton from "@/components/FavoriteButton";
+import ExportMenu from "@/components/ExportMenu";
 
 export default function ProposalPage() {
   const [clientName, setClientName] = useState("");
@@ -188,6 +189,7 @@ export default function ProposalPage() {
                 )}
                 {copied ? "Copied!" : "Copy Markdown"}
               </button>
+              <ExportMenu content={content} title="Proposal" />
               {proposalId && (
                 <FavoriteButton id={proposalId} type="proposal" />
               )}
