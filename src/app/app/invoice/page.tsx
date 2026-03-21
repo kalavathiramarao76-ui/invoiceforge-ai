@@ -17,6 +17,7 @@ import {
   saveInvoice,
   generateId,
 } from "@/lib/storage";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function InvoicePage() {
   const [clientName, setClientName] = useState("");
@@ -364,6 +365,7 @@ export default function InvoicePage() {
               )}
               {copied ? "Copied!" : "Copy Markdown"}
             </button>
+            <FavoriteButton id={invoice.id} type="invoice" />
             <button
               onClick={() => setInvoice(null)}
               className="px-5 py-2.5 text-textMuted hover:text-text transition-colors"

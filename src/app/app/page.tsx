@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { getInvoices, Invoice, deleteInvoice, saveInvoice } from "@/lib/storage";
+import FavoriteButton from "@/components/FavoriteButton";
 
 const tools = [
   {
@@ -208,6 +209,7 @@ export default function Dashboard() {
                   >
                     {inv.status}
                   </button>
+                  <FavoriteButton id={inv.id} type="invoice" size="sm" />
                   <button
                     onClick={(e) => {
                       e.preventDefault();

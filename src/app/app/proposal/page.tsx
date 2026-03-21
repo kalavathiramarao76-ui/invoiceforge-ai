@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { saveProposal, generateId } from "@/lib/storage";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function ProposalPage() {
   const [clientName, setClientName] = useState("");
@@ -19,6 +20,7 @@ export default function ProposalPage() {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [copied, setCopied] = useState(false);
+  const [proposalId, setProposalId] = useState("");
 
   const generate = async () => {
     if (!clientName || !projectTitle || !scope) return;
@@ -58,8 +60,10 @@ export default function ProposalPage() {
         }
       }
 
+      const id = generateId();
+      setProposalId(id);
       saveProposal({
-        id: generateId(),
+        id,
         clientName,
         projectTitle,
         content: fullText,
@@ -184,6 +188,9 @@ export default function ProposalPage() {
                 )}
                 {copied ? "Copied!" : "Copy Markdown"}
               </button>
+              {proposalId && (
+                <FavoriteButton id={proposalId} type="proposal" />
+              )}
             </div>
           )}
 

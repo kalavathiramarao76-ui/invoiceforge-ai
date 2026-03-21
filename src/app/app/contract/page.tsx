@@ -10,6 +10,7 @@ import {
   Check,
 } from "lucide-react";
 import { saveContract, generateId } from "@/lib/storage";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export default function ContractPage() {
   const [clientName, setClientName] = useState("");
@@ -19,6 +20,7 @@ export default function ContractPage() {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
   const [copied, setCopied] = useState(false);
+  const [contractId, setContractId] = useState("");
 
   const generate = async () => {
     if (!clientName || !projectTitle || !terms) return;
@@ -58,8 +60,10 @@ export default function ContractPage() {
         }
       }
 
+      const id = generateId();
+      setContractId(id);
       saveContract({
-        id: generateId(),
+        id,
         clientName,
         projectTitle,
         content: fullText,
@@ -183,6 +187,9 @@ export default function ContractPage() {
                 )}
                 {copied ? "Copied!" : "Copy Markdown"}
               </button>
+              {contractId && (
+                <FavoriteButton id={contractId} type="contract" />
+              )}
             </div>
           )}
 

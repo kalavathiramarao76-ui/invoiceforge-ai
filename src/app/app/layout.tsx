@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   BarChart3,
   FileText,
@@ -10,7 +11,10 @@ import {
   Layers,
   Zap,
   Home,
+  Star,
 } from "lucide-react";
+import OnboardingTour from "@/components/OnboardingTour";
+import { getFavoriteCount } from "@/components/FavoriteButton";
 
 const navItems = [
   { href: "/app", label: "Dashboard", icon: BarChart3 },
@@ -22,9 +26,18 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [favCount, setFavCount] = useState(0);
+
+  useEffect(() => {
+    setFavCount(getFavoriteCount());
+    const handler = () => setFavCount(getFavoriteCount());
+    window.addEventListener("favorites-changed", handler);
+    return () => window.removeEventListener("favorites-changed", handler);
+  }, []);
 
   return (
     <div className="min-h-screen bg-bg flex">
+      <OnboardingTour />
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 h-full w-64 border-r border-border bg-surface/50 backdrop-blur-xl z-40 hidden lg:flex flex-col">
         <div className="p-6 border-b border-border">
@@ -58,6 +71,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+
+          {/* Favorites count */}
+          {favCount > 0 && (
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-amber-400/80">
+              <Star className="w-4 h-4 fill-amber-400/60" />
+              <span>Favorites</span>
+              <span className="ml-auto px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-bold tabular-nums">
+                {favCount}
+              </span>
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t border-border">
