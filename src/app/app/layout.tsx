@@ -14,6 +14,8 @@ import {
   Star,
 } from "lucide-react";
 import OnboardingTour from "@/components/OnboardingTour";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import ThemeToggle from "@/components/ThemeToggle";
 import { getFavoriteCount } from "@/components/FavoriteButton";
 
 const navItems = [
@@ -84,7 +86,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           )}
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4 border-t border-border space-y-2">
+          <div className="px-4 py-2">
+            <ThemeToggle />
+          </div>
           <Link
             href="/"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-textDim hover:text-text hover:bg-surfaceHover transition-all"
@@ -121,7 +126,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main */}
-      <main className="flex-1 lg:ml-64 pb-20 lg:pb-0">{children}</main>
+      <main className="flex-1 lg:ml-64 pb-20 lg:pb-0">
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </main>
     </div>
   );
 }
