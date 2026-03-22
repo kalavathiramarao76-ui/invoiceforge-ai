@@ -35,6 +35,22 @@ body {
   background-size: 256px 256px;
 }
 
+/* Toast slide-in animation */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-toast-in {
+  animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .glow-green {
   box-shadow: 0 0 40px rgba(34, 197, 94, 0.15),
     0 0 80px rgba(34, 197, 94, 0.05);

@@ -12,8 +12,10 @@ import {
 import { saveProposal, generateId } from "@/lib/storage";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 export default function ProposalPage() {
+  const { toast } = useToast();
   const [clientName, setClientName] = useState("");
   const [projectTitle, setProjectTitle] = useState("");
   const [scope, setScope] = useState("");
@@ -70,8 +72,10 @@ export default function ProposalPage() {
         content: fullText,
         createdAt: new Date().toISOString(),
       });
+      toast("Proposal created successfully!");
     } catch (err) {
       console.error("Generation failed:", err);
+      toast("Failed to generate proposal. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -80,6 +84,7 @@ export default function ProposalPage() {
   const copyContent = () => {
     navigator.clipboard.writeText(content);
     setCopied(true);
+    toast("Proposal copied to clipboard!", "info");
     setTimeout(() => setCopied(false), 2000);
   };
 

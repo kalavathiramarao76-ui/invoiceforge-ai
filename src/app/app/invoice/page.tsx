@@ -18,8 +18,10 @@ import {
   generateId,
 } from "@/lib/storage";
 import FavoriteButton from "@/components/FavoriteButton";
+import { useToast } from "@/components/ToastProvider";
 
 export default function InvoicePage() {
+  const { toast } = useToast();
   const [clientName, setClientName] = useState("");
   const [clientEmail, setClientEmail] = useState("");
   const [services, setServices] = useState("");
@@ -114,9 +116,11 @@ export default function InvoicePage() {
         };
         setInvoice(inv);
         saveInvoice(inv);
+        toast("Invoice generated successfully!");
       }
     } catch (err) {
       console.error("Generation failed:", err);
+      toast("Failed to generate invoice. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -149,6 +153,7 @@ export default function InvoicePage() {
     };
     setInvoice(inv);
     saveInvoice(inv);
+    toast("Invoice created successfully!");
   };
 
   const exportPDF = () => {
@@ -160,6 +165,7 @@ export default function InvoicePage() {
     const md = `# Invoice ${invoice.invoiceNumber}\n\n**Client:** ${invoice.clientName}\n**Email:** ${invoice.clientEmail}\n**Date:** ${new Date(invoice.createdAt).toLocaleDateString()}\n**Due:** ${invoice.dueDate}\n\n## Line Items\n\n| Description | Hours | Rate | Amount |\n|---|---|---|---|\n${invoice.items.map((i) => `| ${i.description} | ${i.hours} | $${i.rate} | $${i.amount.toFixed(2)} |`).join("\n")}\n\n**Subtotal:** $${invoice.subtotal.toFixed(2)}\n**Tax (${invoice.taxRate}%):** $${invoice.taxAmount.toFixed(2)}\n**Total:** $${invoice.total.toFixed(2)}\n\n**Payment Terms:** ${invoice.paymentTerms}\n\n${invoice.notes}`;
     navigator.clipboard.writeText(md);
     setCopied(true);
+    toast("Invoice copied to clipboard!", "info");
     setTimeout(() => setCopied(false), 2000);
   };
 

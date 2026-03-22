@@ -12,8 +12,10 @@ import {
 import { saveContract, generateId } from "@/lib/storage";
 import FavoriteButton from "@/components/FavoriteButton";
 import ExportMenu from "@/components/ExportMenu";
+import { useToast } from "@/components/ToastProvider";
 
 export default function ContractPage() {
+  const { toast } = useToast();
   const [clientName, setClientName] = useState("");
   const [projectTitle, setProjectTitle] = useState("");
   const [terms, setTerms] = useState("");
@@ -70,8 +72,10 @@ export default function ContractPage() {
         content: fullText,
         createdAt: new Date().toISOString(),
       });
+      toast("Contract drafted successfully!");
     } catch (err) {
       console.error("Generation failed:", err);
+      toast("Failed to generate contract. Please try again.", "error");
     } finally {
       setLoading(false);
     }
@@ -80,6 +84,7 @@ export default function ContractPage() {
   const copyContent = () => {
     navigator.clipboard.writeText(content);
     setCopied(true);
+    toast("Contract copied to clipboard!", "info");
     setTimeout(() => setCopied(false), 2000);
   };
 
