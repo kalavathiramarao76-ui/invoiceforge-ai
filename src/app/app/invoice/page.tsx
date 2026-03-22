@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { incrementUsage } from "@/lib/usage";
 import {
   FileText,
   Sparkles,
@@ -72,6 +71,14 @@ export default function InvoicePage() {
         }),
       });
 
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
+
       let fullText = "";
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -117,7 +124,6 @@ export default function InvoicePage() {
         };
         setInvoice(inv);
         saveInvoice(inv);
-        incrementUsage();
         toast("Invoice generated successfully!");
       }
     } catch (err) {

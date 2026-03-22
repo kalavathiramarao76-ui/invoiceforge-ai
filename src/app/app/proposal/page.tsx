@@ -40,6 +40,14 @@ export default function ProposalPage() {
         }),
       });
 
+      if (res.status === 429) {
+        const errorData = await res.json();
+        if (errorData.error === "FREE_LIMIT_REACHED") {
+          window.dispatchEvent(new CustomEvent("usage-changed", { detail: errorData.count }));
+          return;
+        }
+      }
+
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
