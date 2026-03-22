@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import {
   FileText,
   Send,
@@ -13,6 +14,164 @@ import {
   Clock,
   DollarSign,
 } from "lucide-react";
+
+// ── Reduced motion check ─────────────────────────────────────────────
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return reduced;
+}
+
+// ── Letter-by-letter hero reveal ─────────────────────────────────────
+function LetterReveal({ text, className = "", stagger = 30, delay = 0 }: { text: string; className?: string; stagger?: number; delay?: number }) {
+  const reduced = usePrefersReducedMotion();
+  const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => setVisible(true), delay);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [delay]);
+
+  if (reduced) return <span className={className}>{text}</span>;
+
+  return (
+    <span ref={ref} className={className} aria-label={text}>
+      {text.split("").map((char, i) => (
+        <span
+          key={i}
+          className="letter-reveal-char"
+          style={{
+            transitionDelay: visible ? `${i * stagger}ms` : "0ms",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(0.3em)",
+          }}
+          aria-hidden="true"
+        >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ── Stats counter animation ──────────────────────────────────────────
+function AnimatedCounter({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
+  const reduced = usePrefersReducedMotion();
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!started || reduced) {
+      if (started) setCount(value);
+      return;
+    }
+    let frame: number;
+    const duration = 800;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * value));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [started, value, reduced]);
+
+  return <span ref={ref}>{prefix}{count}{suffix}</span>;
+}
+
+// ── Scroll fade-up via IntersectionObserver ───────────────────────────
+function FadeUp({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`fade-up-section ${className}`} style={{ transitionDelay: `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
+// ── 3D Card tilt ─────────────────────────────────────────────────────
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduced = usePrefersReducedMotion();
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reduced || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    ref.current.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-2px)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (ref.current) {
+      ref.current.style.transform = "perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0px)";
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={`tilt-card ${className}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </div>
+  );
+}
 
 const features = [
   {
@@ -84,12 +243,11 @@ export default function LandingPage() {
               For freelancers who mean business
             </p>
             <h1
-              className="text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter leading-[0.9] mb-8 fade-in"
-              style={{ animationDelay: "0.1s" }}
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter leading-[0.9] mb-8"
             >
-              Get paid
+              <LetterReveal text="Get paid" stagger={30} />
               <br />
-              <span className="text-gradient">faster.</span>
+              <span className="text-gradient"><LetterReveal text="faster." stagger={35} delay={300} /></span>
             </h1>
             <p
               className="text-xl sm:text-2xl text-textMuted max-w-2xl leading-relaxed mb-12 fade-in"
@@ -122,21 +280,30 @@ export default function LandingPage() {
       </section>
 
       {/* Stats bar */}
-      <section className="border-y border-border bg-surface/50">
-        <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-3 gap-12">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center sm:text-left">
+      <FadeUp>
+        <section className="border-y border-border bg-surface/50">
+          <div className="max-w-7xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-3 gap-12">
+            <div className="text-center sm:text-left">
               <div className="text-5xl font-bold tracking-tighter text-text mb-2">
-                {stat.value}
+                <AnimatedCounter value={0} prefix="$" />
               </div>
-              <div className="text-textMuted">
-                {stat.label}{" "}
-                <span className="text-textDim">{stat.sublabel}</span>
-              </div>
+              <div className="text-textMuted">Platform fees <span className="text-textDim">forever</span></div>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="text-center sm:text-left">
+              <div className="text-5xl font-bold tracking-tighter text-text mb-2">
+                &lt;<AnimatedCounter value={10} suffix="s" />
+              </div>
+              <div className="text-textMuted">To generate <span className="text-textDim">any document</span></div>
+            </div>
+            <div className="text-center sm:text-left">
+              <div className="text-5xl font-bold tracking-tighter text-text mb-2">
+                <AnimatedCounter value={6} />
+              </div>
+              <div className="text-textMuted">Templates <span className="text-textDim">ready to use</span></div>
+            </div>
+          </div>
+        </section>
+      </FadeUp>
 
       {/* How it works */}
       <section className="py-32 px-6">
@@ -204,19 +371,18 @@ export default function LandingPage() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((f) => (
-              <div
-                key={f.title}
-                className="p-8 rounded-2xl border border-border bg-surface/30 card-hover group"
-              >
-                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
-                  <f.icon className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="text-lg font-semibold mb-3">{f.title}</h3>
-                <p className="text-textMuted text-sm leading-relaxed">
-                  {f.desc}
-                </p>
-              </div>
+            {features.map((f, i) => (
+              <FadeUp key={f.title} delay={i * 80}>
+                <TiltCard className="p-8 rounded-2xl border border-border bg-surface/30 group">
+                  <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
+                    <f.icon className="w-6 h-6 text-accent" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-3">{f.title}</h3>
+                  <p className="text-textMuted text-sm leading-relaxed">
+                    {f.desc}
+                  </p>
+                </TiltCard>
+              </FadeUp>
             ))}
           </div>
         </div>
