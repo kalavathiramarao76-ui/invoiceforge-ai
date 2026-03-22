@@ -156,6 +156,7 @@ export default function ProposalPage() {
           <button
             onClick={generate}
             disabled={loading || !clientName || !projectTitle || !scope}
+            aria-label={loading ? "Generating proposal" : "Generate proposal with AI"}
             className="w-full py-3 px-6 bg-accent text-bg font-semibold rounded-xl hover:bg-accentDark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (

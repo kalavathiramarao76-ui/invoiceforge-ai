@@ -155,6 +155,7 @@ export default function ContractPage() {
           <button
             onClick={generate}
             disabled={loading || !clientName || !projectTitle || !terms}
+            aria-label={loading ? "Drafting contract" : "Generate contract with AI"}
             className="w-full py-3 px-6 bg-accent text-bg font-semibold rounded-xl hover:bg-accentDark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (

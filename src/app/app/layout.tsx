@@ -128,7 +128,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Main */}
-      <main className="flex-1 lg:ml-64 pb-20 lg:pb-0">
+      <main role="main" className="flex-1 lg:ml-64 pb-20 lg:pb-0">
         <ErrorBoundary>{children}</ErrorBoundary>
       </main>
     </div>

@@ -250,6 +250,7 @@ export default function InvoicePage() {
               <button
                 onClick={generateWithAI}
                 disabled={loading || !clientName || !services}
+                aria-label={loading ? "Generating invoice" : "Generate invoice with AI"}
                 className="w-full py-3 px-6 bg-accent text-bg font-semibold rounded-xl hover:bg-accentDark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
