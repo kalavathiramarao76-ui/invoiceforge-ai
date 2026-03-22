@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ToastProvider from "@/components/ToastProvider";
+import { AuthGate } from "@/components/AuthGate";
 
 const siteUrl = "https://invoiceforge-ai.vercel.app";
 
@@ -92,9 +93,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <div className="noise" />
-        <ToastProvider>
+        <AuthGate><ToastProvider>
           {children}
-        </ToastProvider>
+        </ToastProvider></AuthGate>
       </body>
     </html>
   );

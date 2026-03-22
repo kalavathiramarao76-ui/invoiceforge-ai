@@ -18,6 +18,7 @@ import OnboardingTour from "@/components/OnboardingTour";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ThemeToggle from "@/components/ThemeToggle";
 import { getFavoriteCount } from "@/components/FavoriteButton";
+import { UserMenu } from "@/components/AuthGate";
 
 const navItems = [
   { href: "/app", label: "Dashboard", icon: BarChart3 },
@@ -89,6 +90,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-4 border-t border-border space-y-2">
+          <div className="px-4 py-2"><UserMenu /></div>
           <div className="px-4 py-2">
             <ThemeToggle />
           </div>

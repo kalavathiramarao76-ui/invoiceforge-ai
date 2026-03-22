@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { incrementUsage } from "@/lib/usage";
 import {
   FileText,
   Sparkles,
@@ -116,6 +117,7 @@ export default function InvoicePage() {
         };
         setInvoice(inv);
         saveInvoice(inv);
+        incrementUsage();
         toast("Invoice generated successfully!");
       }
     } catch (err) {
